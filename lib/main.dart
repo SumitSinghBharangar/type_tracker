@@ -14,15 +14,15 @@ class MyApp extends StatelessWidget {
     return ScreenUtilInit(
         designSize: const Size(430, 932),
         minTextAdapt: true,
+        splitScreenMode: true,
         builder: (context, _) {
           return MaterialApp(
             title: 'Flutter Demo',
-            theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-              useMaterial3: true,
-            ),
+            theme: ThemeData.light(), // Light Theme
+            darkTheme: ThemeData.dark(), // Dark Theme
+            themeMode: ThemeMode.system, // System-based theme switching
             debugShowCheckedModeBanner: false,
-            home: HomeScreen(),
+            home: const HomeScreen(),
           );
         });
   }

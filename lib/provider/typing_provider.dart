@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:type_tracker/common/enum.dart';
 
 class TypingTestProvider with ChangeNotifier {
   bool isPaused = false;
@@ -7,26 +8,61 @@ class TypingTestProvider with ChangeNotifier {
   bool isTestStarted = false;
   int wpm = 0;
   int accuracy = 0;
+  DifficultyLevel difficulty = DifficultyLevel.moderate;
 
-  // Character metrics tracking
   final Map<String, CharacterMetrics> _charMetrics = {};
   DateTime? _lastKeyPressTime;
 
-  final String sampleText =
-      "The quick brown fox jumps over the lazy dog. Pack my box with five dozen liquor jugs. How vexingly quick daft zebras jump! The five boxing wizards jump quickly. Pack my red box with five dozen quality jugs.";
+  final Map<DifficultyLevel, String> _sampleTexts = {
+    DifficultyLevel.easy:
+        '''The quick brown fox jumps over the lazy dog. This is a simple typing test to help you improve your speed and accuracy. Take your time and focus on getting each word right. Remember to maintain proper typing posture and finger placement on the home row keys.''',
+    DifficultyLevel.moderate:
+        '''The quick brown fox jumps over the lazy dog. Pack my box with five dozen liquor jugs. How vexingly quick daft zebras jump! The five boxing wizards jump quickly. Programming requires attention to detail and consistent practice to master the fundamentals.''',
+    DifficultyLevel.hard:
+        '''The quick brown fox jumps over the lazy dog. Pack my box with five dozen liquor jugs. Mr. Jock, TV quiz PhD, bags few lynx. Two driven jocks help fax my big quiz. The job requires extra pluck and zeal from every young wage earner. How vexingly quick daft zebras jump! The five boxing wizards jump quickly.'''
+  };
+
+  String get sampleText =>
+      _sampleTexts[difficulty] ?? _sampleTexts[DifficultyLevel.moderate]!;
 
   Map<String, double> get characterSpeeds {
     Map<String, double> speeds = {};
+
+    // First, initialize all characters from sample text with 0 speed
+    for (var char in sampleText.toUpperCase().split('')) {
+      speeds[char] = 0;
+    }
+
+    // Then update with actual speeds for typed characters
     _charMetrics.forEach((char, metrics) {
-      speeds[char] = metrics.averageSpeed;
+      if (metrics.occurrences > 0) {
+        speeds[char] = metrics.averageSpeed;
+      }
     });
+
     return speeds;
+  }
+
+  void setDifficulty(DifficultyLevel level) {
+    difficulty = level;
+    switch (level) {
+      case DifficultyLevel.easy:
+        timeLeft = 90;
+        break;
+      case DifficultyLevel.moderate:
+        timeLeft = 60;
+        break;
+      case DifficultyLevel.hard:
+        timeLeft = 30;
+        break;
+    }
+    reset();
   }
 
   void togglePause() {
     isPaused = !isPaused;
     if (isPaused) {
-      _lastKeyPressTime = null; // Reset last key press time when paused
+      _lastKeyPressTime = null;
     }
     notifyListeners();
   }
@@ -50,15 +86,15 @@ class TypingTestProvider with ChangeNotifier {
 
         double timeDiffMs =
             now.difference(_lastKeyPressTime!).inMilliseconds.toDouble();
-        _charMetrics[newChar]!.occurrences++;
-        _charMetrics[newChar]!.totalTimeMs += timeDiffMs;
-        _charMetrics[newChar]!.lastTypedTime = now;
+        // Only update metrics if the time difference is reasonable (e.g., less than 5 seconds)
+        if (timeDiffMs > 0 && timeDiffMs < 5000) {
+          _charMetrics[newChar]!.occurrences++;
+          _charMetrics[newChar]!.totalTimeMs += timeDiffMs;
+          _charMetrics[newChar]!.lastTypedTime = now;
+        }
       }
 
       _lastKeyPressTime = now;
-    } else if (value.length < userInput.length) {
-      // Character deleted
-      _lastKeyPressTime = DateTime.now();
     }
 
     userInput = value;
@@ -84,13 +120,24 @@ class TypingTestProvider with ChangeNotifier {
     accuracy = ((correctChars / userInput.length) * 100).round();
 
     // Calculate WPM
-    int timeSpent = 60 - timeLeft;
+    int totalTime = getDifficultyTime();
+    int timeSpent = totalTime - timeLeft;
     if (timeSpent > 0) {
-      // Use standard word length of 5 characters
       double words = userInput.length / 5;
       wpm = ((words / timeSpent) * 60).round();
     } else {
       wpm = 0;
+    }
+  }
+
+  int getDifficultyTime() {
+    switch (difficulty) {
+      case DifficultyLevel.easy:
+        return 90;
+      case DifficultyLevel.moderate:
+        return 60;
+      case DifficultyLevel.hard:
+        return 30;
     }
   }
 
@@ -104,7 +151,7 @@ class TypingTestProvider with ChangeNotifier {
 
   void reset() {
     isPaused = false;
-    timeLeft = 60;
+    timeLeft = getDifficultyTime();
     userInput = '';
     isTestStarted = false;
     wpm = 0;
@@ -114,7 +161,6 @@ class TypingTestProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Get the fastest and slowest characters for scaling the graph
   Map<String, double> getSpeedRange() {
     if (_charMetrics.isEmpty) {
       return {'min': 0, 'max': 100};
@@ -123,17 +169,26 @@ class TypingTestProvider with ChangeNotifier {
     double minSpeed = double.infinity;
     double maxSpeed = 0;
 
+    // Only consider characters that have actually been typed
     _charMetrics.forEach((_, metrics) {
-      double speed = metrics.averageSpeed;
-      if (speed > 0) {
-        minSpeed = speed < minSpeed ? speed : minSpeed;
-        maxSpeed = speed > maxSpeed ? speed : maxSpeed;
+      if (metrics.occurrences > 0) {
+        double speed = metrics.averageSpeed;
+        if (speed > 0) {
+          minSpeed = speed < minSpeed ? speed : minSpeed;
+          maxSpeed = speed > maxSpeed ? speed : maxSpeed;
+        }
       }
     });
 
+    // If no valid speeds were found, return default range
+    if (minSpeed == double.infinity || maxSpeed == 0) {
+      return {'min': 0, 'max': 100};
+    }
+
     return {
-      'min': minSpeed == double.infinity ? 0 : minSpeed,
-      'max': maxSpeed == 0 ? 100 : maxSpeed * 1.2 // Add 20% padding to max
+      'min': minSpeed,
+      'max':
+          maxSpeed * 1.2 // Add 20% padding to the max for better visualization
     };
   }
 }
@@ -143,6 +198,11 @@ class CharacterMetrics {
   double totalTimeMs = 0;
   DateTime? lastTypedTime;
 
-  double get averageSpeed =>
-      occurrences > 0 ? (occurrences / (totalTimeMs / 1000)) * 60 : 0;
+  double get averageSpeed {
+    // Only calculate speed if the character has been typed
+    if (occurrences > 0 && totalTimeMs > 0) {
+      return (occurrences / (totalTimeMs / 1000)) * 60;
+    }
+    return 0; // Return 0 for untyped characters
+  }
 }

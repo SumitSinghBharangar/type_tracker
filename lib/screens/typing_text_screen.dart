@@ -1,6 +1,7 @@
 // lib/screens/typing_test_screen.dart
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
 
@@ -60,7 +61,10 @@ class _TypingTestScreenState extends State<TypingTestScreen> {
         return Scaffold(
           body: SafeArea(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.symmetric(
+                horizontal: 20.w,
+                vertical: 20.h,
+              ),
               child: Column(
                 children: [
                   Row(
@@ -85,18 +89,18 @@ class _TypingTestScreenState extends State<TypingTestScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20.h),
                   Text(
                     '${(provider.timeLeft ~/ 60).toString().padLeft(2, '0')}:${(provider.timeLeft % 60).toString().padLeft(2, '0')}',
-                    style: const TextStyle(
-                      fontSize: 48,
+                    style: TextStyle(
+                      fontSize: 48.sp,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20.h),
                   Container(
-                    margin: const EdgeInsets.symmetric(vertical: 20),
+                    margin: EdgeInsets.symmetric(vertical: 20.h),
                     child: RichText(
                       text: TextSpan(
                         children: [
@@ -111,7 +115,7 @@ class _TypingTestScreenState extends State<TypingTestScreen> {
                                         ? Colors.green
                                         : Colors.red
                                     : Colors.grey[400],
-                                fontSize: 18,
+                                fontSize: 21.sp,
                               ),
                             ),
                         ],
@@ -146,11 +150,13 @@ class _TypingTestScreenState extends State<TypingTestScreen> {
 
   Widget _buildAchievement(IconData icon, Color color, String count) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4),
+      margin: EdgeInsets.symmetric(
+        horizontal: 4.w,
+      ),
       child: Row(
         children: [
           Icon(icon, color: color),
-          const SizedBox(width: 4),
+          SizedBox(width: 4.w),
           Text(
             count,
             style: const TextStyle(color: Colors.white),

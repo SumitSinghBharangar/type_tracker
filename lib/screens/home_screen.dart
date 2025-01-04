@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:type_tracker/screens/difficulty_type_screen.dart';
 import 'package:type_tracker/screens/typing_text_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -150,10 +151,12 @@ class _HomeScreenState extends State<HomeScreen> {
               width: 200.w,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
-                      context,
-                      CupertinoPageRoute(
-                          builder: (context) => TypingTestScreen()));
+                  Navigator.pushReplacement(
+                    context,
+                    CupertinoPageRoute(
+                      builder: (context) => DifficultyTypeScreen(),
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF68A7E8),

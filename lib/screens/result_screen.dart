@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:type_tracker/provider/typing_provider.dart';
-import 'package:type_tracker/screens/typing_text_screen.dart';
+import 'package:type_tracker/screens/difficulty_type_screen.dart';
 
 class ResultsScreen extends StatelessWidget {
   const ResultsScreen({super.key});
+
+  String _getTimeDisplay(TypingTestProvider provider) {
+    int totalTime = provider.getDifficultyTime();
+    int elapsedTime = totalTime - provider.timeLeft;
+    return '${elapsedTime}s';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,19 +28,24 @@ class ResultsScreen extends StatelessWidget {
         return Scaffold(
           body: SafeArea(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.symmetric(
+                horizontal: 20.w,
+                vertical: 20.h,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Current Result',
                     style: TextStyle(
-                      fontSize: 24,
+                      fontSize: 24.sp,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(
+                    height: 16.h,
+                  ),
 
                   // Stats Cards
                   Row(
@@ -46,7 +58,9 @@ class ResultsScreen extends StatelessWidget {
                           Colors.blue,
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      SizedBox(
+                        width: 12.w,
+                      ),
                       Expanded(
                         child: _buildCurrentStatCard(
                           'Accuracy',
@@ -55,11 +69,13 @@ class ResultsScreen extends StatelessWidget {
                           Colors.green,
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      SizedBox(
+                        width: 12.w,
+                      ),
                       Expanded(
                         child: _buildCurrentStatCard(
                           'Time',
-                          '${60 - provider.timeLeft}s',
+                          _getTimeDisplay(provider),
                           Icons.timer,
                           Colors.orange,
                         ),
@@ -67,16 +83,20 @@ class ResultsScreen extends StatelessWidget {
                     ],
                   ),
 
-                  const SizedBox(height: 24),
-                  const Text(
+                  SizedBox(
+                    height: 24.h,
+                  ),
+                  Text(
                     'Speed per Character',
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 20.sp,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(
+                    height: 16.h,
+                  ),
 
                   // Scrollable Character Speed Graph
                   Expanded(
@@ -173,7 +193,9 @@ class ResultsScreen extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 24),
+                  SizedBox(
+                    height: 24.h,
+                  ),
 
                   // Try Again Button
                   SizedBox(
@@ -184,21 +206,23 @@ class ResultsScreen extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const TypingTestScreen(),
+                            builder: (context) => const DifficultyTypeScreen(),
                           ),
                         );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: EdgeInsets.symmetric(
+                          vertical: 16.h,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Try Again',
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 18.sp,
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),

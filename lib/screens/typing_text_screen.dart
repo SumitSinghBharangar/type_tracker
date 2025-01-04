@@ -1,8 +1,11 @@
-import 'dart:async';
-
+// lib/screens/typing_test_screen.dart
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:async';
+
 import 'package:type_tracker/provider/typing_provider.dart';
+import 'package:type_tracker/screens/result_screen.dart';
 
 class TypingTestScreen extends StatefulWidget {
   const TypingTestScreen({super.key});
@@ -14,6 +17,7 @@ class TypingTestScreen extends StatefulWidget {
 class _TypingTestScreenState extends State<TypingTestScreen> {
   late TextEditingController _controller;
   Timer? _timer;
+  bool _hasNavigated = false;
 
   @override
   void initState() {
@@ -25,7 +29,19 @@ class _TypingTestScreenState extends State<TypingTestScreen> {
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (mounted) {
-        Provider.of<TypingTestProvider>(context, listen: false).tick();
+        final provider =
+            Provider.of<TypingTestProvider>(context, listen: false);
+        provider.tick();
+
+        // Check if timer has reached 0 and navigate to results
+        if (provider.timeLeft <= 0 && !_hasNavigated) {
+          _hasNavigated = true; // Prevent multiple navigations
+          _timer?.cancel();
+          Navigator.pushReplacement(
+            context,
+            CupertinoPageRoute(builder: (context) => const ResultsScreen()),
+          );
+        }
       }
     });
   }

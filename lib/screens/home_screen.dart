@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:type_tracker/screens/difficulty_type_screen.dart';
-import 'package:type_tracker/screens/typing_text_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,13 +11,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String selectedDifficulty = 'Easy';
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor:
-          !isDarkMode ? Colors.lightBlueAccent : const Color(0xFF0A1736),
+      backgroundColor: const Color(0xFF0A1736),
+      // !isDarkMode ? Colors.lightBlueAccent : ,
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -99,47 +96,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   SizedBox(height: 20.h),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      "Difficulty",
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10.h),
-                  DropdownButtonFormField<String>(
-                    items: const [
-                      DropdownMenuItem(
-                        value: "Easy",
-                        child: Text("Easy"),
-                      ),
-                      DropdownMenuItem(
-                        value: "Medium",
-                        child: Text("Medium"),
-                      ),
-                      DropdownMenuItem(
-                        value: "Hard",
-                        child: Text("Hard"),
-                      ),
-                    ],
-                    value: "Easy",
-                    dropdownColor: const Color(0xFF102348),
-                    style: const TextStyle(color: Colors.white),
-                    onChanged: (value) {},
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.black,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
